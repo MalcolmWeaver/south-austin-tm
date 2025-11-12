@@ -1,4 +1,5 @@
 import { getCalendarEvents } from "./calendar";
+import { logger } from "./logger";
 
 export interface BannerState {
   show: boolean;
@@ -11,13 +12,23 @@ export interface BannerState {
  * Returns banner state indicating whether to show "no meeting" alert
  */
 export async function getNextTuesdayMeeting(): Promise<BannerState> {
+  logger.info("banner", "function_start", {
+    timestamp: new Date().toISOString(),
+    mockMode: process.env.MOCK_NO_MEETING
+  });
+
   try {
     // Get next Tuesday
     const today = new Date();
     const nextTuesday = getNextTuesday(today);
 
+    logger.info("banner", "calculated_next_tuesday", {
+      nextTuesday: nextTuesday.toISOString()
+    });
+
     // Mock mode for testing "no meeting" banner
     if (process.env.MOCK_NO_MEETING === "true") {
+      logger.info("banner", "mock_mode_active", {});
       const formattedDate = formatDate(nextTuesday);
       return {
         show: true,
@@ -26,7 +37,9 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
       };
     }
 
+    logger.info("banner", "calling_get_calendar_events", { clubId: "1938" });
     const events = await getCalendarEvents("1938");
+    logger.info("banner", "received_calendar_events", { eventCount: events?.length ?? 0 });
 
     // If we couldn't fetch events, show generic message
     if (!events || events.length === 0) {
@@ -60,7 +73,7 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
       nextMeetingDate: nextTuesdayMeeting.start,
     };
   } catch (error) {
-    console.error("Error checking for next Tuesday meeting:", error);
+    logger.error("banner", "get_next_tuesday_error", error);
     // Default to not showing banner on error (avoid false alarms)
     return {
       show: false,

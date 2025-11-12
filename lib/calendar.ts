@@ -1,5 +1,4 @@
 import ical from "node-ical";
-import fetch from "node-fetch";
 import { logger } from "./logger";
 
 export interface CalendarEvent {
@@ -20,31 +19,51 @@ export interface CalendarEvent {
  * @returns Array of parsed calendar events
  */
 export async function getCalendarEvents(clubId: string = "1938"): Promise<CalendarEvent[]> {
+  logger.info("calendar", "function_entry", {
+    clubId,
+    timestamp: new Date().toISOString()
+  });
+
   try {
     const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
     logger.info("calendar", "fetch_start", { url, clubId });
 
-    // Fetch with node-fetch for better control and to avoid 403
+    // Use native Next.js fetch (works better in Server Components)
+    // Using minimal headers - sometimes less is more to avoid blocking
     const response = await fetch(url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-        "Accept": "text/calendar,*/*",
-        "Accept-Encoding": "gzip, deflate, br",
       },
+      cache: "no-store", // Disable caching for debugging
+    });
+
+    // Log detailed response info including headers
+    const responseHeaders: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      responseHeaders[key] = value;
     });
 
     logger.info("calendar", "fetch_response", {
       status: response.status,
       statusText: response.statusText,
+      headers: responseHeaders,
+      url: response.url,
     });
 
     if (!response.ok) {
-      const errorBody = await response.text();
+      let errorBody = "";
+      try {
+        errorBody = await response.text();
+      } catch (e) {
+        logger.error("calendar", "error_reading_body", e);
+      }
+
       const error = new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
       logger.error("calendar", "fetch_failed", error, {
         status: response.status,
         statusText: response.statusText,
-        errorBody,
+        errorBody: errorBody.substring(0, 500), // Limit error body length
+        headers: responseHeaders,
       });
       throw error;
     }
