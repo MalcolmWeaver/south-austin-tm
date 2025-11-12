@@ -46,7 +46,8 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 
       // Only process VEVENT type components
       if (event.type === "VEVENT") {
-        const vevent = event as CalendarComponent;
+        // node-ical types are incomplete, using any for runtime properties
+        const vevent = event as any;
 
         // Parse description for theme and word of the day
         const description = vevent.description || "";
