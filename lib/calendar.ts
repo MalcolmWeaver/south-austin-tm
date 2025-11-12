@@ -1,5 +1,7 @@
 import ical from "node-ical";
 import { logger } from "./logger";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 export interface CalendarEvent {
   uid: string;
@@ -28,29 +30,16 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 
   try {
     // First, try to read from the static file synced by GitHub Actions
-    logger.info("calendar", "trying_static_file", { path: "/calendar.ics" });
+    const calendarFilePath = join(process.cwd(), 'public', 'calendar.ics');
+    logger.info("calendar", "trying_static_file", { path: calendarFilePath });
 
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    icsData = await readFile(calendarFilePath, 'utf-8');
 
-    const staticFileUrl = `${baseUrl}/calendar.ics`;
-
-    const staticResponse = await fetch(staticFileUrl, {
-      cache: "no-store",
-    });
-
-    if (staticResponse.ok) {
-      icsData = await staticResponse.text();
-
-      // Verify it's valid calendar data
-      if (icsData.includes("BEGIN:VCALENDAR")) {
-        logger.info("calendar", "using_static_file", { dataLength: icsData.length });
-      } else {
-        throw new Error("Static file doesn't contain valid calendar data");
-      }
+    // Verify it's valid calendar data
+    if (icsData.includes("BEGIN:VCALENDAR")) {
+      logger.info("calendar", "using_static_file", { dataLength: icsData.length });
     } else {
-      throw new Error(`Static file not found: ${staticResponse.status}`);
+      throw new Error("Static file doesn't contain valid calendar data");
     }
   } catch (staticError) {
     // Fallback: Try to fetch directly from Easy-Speak
