@@ -1,4 +1,6 @@
 import ical from "node-ical";
+import fetch from "node-fetch";
+import { logger } from "./logger";
 
 export interface CalendarEvent {
   uid: string;
@@ -20,61 +22,41 @@ export interface CalendarEvent {
 export async function getCalendarEvents(clubId: string = "1938"): Promise<CalendarEvent[]> {
   try {
     const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
-    console.log(JSON.stringify({
-      level: "info",
-      service: "calendar",
-      action: "fetch_start",
-      url,
-      clubId,
-    }));
+    logger.info("calendar", "fetch_start", { url, clubId });
 
-    // Fetch with User-Agent and additional headers to avoid 403
+    // Fetch with node-fetch for better control and to avoid 403
     const response = await fetch(url, {
       headers: {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
         "Accept": "text/calendar,*/*",
         "Accept-Encoding": "gzip, deflate, br",
       },
-      next: { revalidate: 14400 }, // Revalidate every 4 hours
     });
 
-    console.log(JSON.stringify({
-      level: "info",
-      service: "calendar",
-      action: "fetch_response",
+    logger.info("calendar", "fetch_response", {
       status: response.status,
       statusText: response.statusText,
-    }));
+    });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error(JSON.stringify({
-        level: "error",
-        service: "calendar",
-        action: "fetch_failed",
+      const error = new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
+      logger.error("calendar", "fetch_failed", error, {
         status: response.status,
         statusText: response.statusText,
         errorBody,
-      }));
-      throw new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
+      });
+      throw error;
     }
 
     const icsData = await response.text();
-    console.log(JSON.stringify({
-      level: "info",
-      service: "calendar",
-      action: "received_ics_data",
-      dataLength: icsData.length,
-    }));
+    logger.info("calendar", "received_ics_data", { dataLength: icsData.length });
 
     // Parse the iCal data
     const events = await ical.async.parseICS(icsData);
-    console.log(JSON.stringify({
-      level: "info",
-      service: "calendar",
-      action: "parsed_events",
+    logger.info("calendar", "parsed_events", {
       rawEventCount: Object.keys(events).length,
-    }));
+    });
 
     // Filter and transform events
     const calendarEvents: CalendarEvent[] = [];
@@ -127,22 +109,13 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 
     const upcomingEvents = calendarEvents.filter(event => event.start >= today);
 
-    console.log(JSON.stringify({
-      level: "info",
-      service: "calendar",
-      action: "process_complete",
+    logger.info("calendar", "process_complete", {
       totalEvents: calendarEvents.length,
       upcomingEvents: upcomingEvents.length,
-    }));
+    });
     return upcomingEvents;
   } catch (error) {
-    console.error(JSON.stringify({
-      level: "error",
-      service: "calendar",
-      action: "fetch_error",
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    }));
+    logger.error("calendar", "fetch_error", error);
     return [];
   }
 }
