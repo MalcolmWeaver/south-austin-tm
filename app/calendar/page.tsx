@@ -9,6 +9,14 @@ export default async function CalendarPage() {
   // Fetch calendar events from Easy-Speak
   const events = await getCalendarEvents("1938");
 
+  // Log for debugging in deployment
+  console.log(JSON.stringify({
+    level: "info",
+    service: "calendar_page",
+    action: "render",
+    eventCount: events.length,
+  }));
+
   return (
     <div className="py-12 bg-gray-50 min-h-screen">
       {/* JSON-LD Structured Data for LocalBusiness */}
@@ -102,9 +110,30 @@ export default async function CalendarPage() {
               />
             </svg>
             <h3 className="text-xl font-bold text-gray-900 mb-2">No Upcoming Meetings</h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               Check back soon for our next meeting schedule, or contact us for more information.
             </p>
+            <details className="mt-4 text-left">
+              <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                Troubleshooting Information
+              </summary>
+              <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-4 rounded">
+                <p className="mb-2">
+                  If you&apos;re seeing this and expect events to be shown, check the server logs for
+                  calendar fetch errors. The logs will show:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Whether the network request was attempted</li>
+                  <li>HTTP response status codes</li>
+                  <li>Any parsing or processing errors</li>
+                  <li>Number of events fetched and filtered</li>
+                </ul>
+                <p className="mt-2">
+                  Calendar data is cached for 4 hours. You may need to wait for the cache to expire
+                  or trigger a redeployment to see updates.
+                </p>
+              </div>
+            </details>
           </div>
         )}
 

@@ -20,6 +20,13 @@ export interface CalendarEvent {
 export async function getCalendarEvents(clubId: string = "1938"): Promise<CalendarEvent[]> {
   try {
     const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
+    console.log(JSON.stringify({
+      level: "info",
+      service: "calendar",
+      action: "fetch_start",
+      url,
+      clubId,
+    }));
 
     // Fetch with User-Agent header as shown in the example
     const response = await fetch(url, {
@@ -29,14 +36,43 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
       next: { revalidate: 14400 }, // Revalidate every 4 hours
     });
 
+    console.log(JSON.stringify({
+      level: "info",
+      service: "calendar",
+      action: "fetch_response",
+      status: response.status,
+      statusText: response.statusText,
+    }));
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch calendar: ${response.status}`);
+      const errorBody = await response.text();
+      console.error(JSON.stringify({
+        level: "error",
+        service: "calendar",
+        action: "fetch_failed",
+        status: response.status,
+        statusText: response.statusText,
+        errorBody,
+      }));
+      throw new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
     }
 
     const icsData = await response.text();
+    console.log(JSON.stringify({
+      level: "info",
+      service: "calendar",
+      action: "received_ics_data",
+      dataLength: icsData.length,
+    }));
 
     // Parse the iCal data
     const events = await ical.async.parseICS(icsData);
+    console.log(JSON.stringify({
+      level: "info",
+      service: "calendar",
+      action: "parsed_events",
+      rawEventCount: Object.keys(events).length,
+    }));
 
     // Filter and transform events
     const calendarEvents: CalendarEvent[] = [];
@@ -89,9 +125,22 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 
     const upcomingEvents = calendarEvents.filter(event => event.start >= today);
 
+    console.log(JSON.stringify({
+      level: "info",
+      service: "calendar",
+      action: "process_complete",
+      totalEvents: calendarEvents.length,
+      upcomingEvents: upcomingEvents.length,
+    }));
     return upcomingEvents;
   } catch (error) {
-    console.error("Error fetching calendar events:", error);
+    console.error(JSON.stringify({
+      level: "error",
+      service: "calendar",
+      action: "fetch_error",
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    }));
     return [];
   }
 }

@@ -21,13 +21,14 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
       const formattedDate = formatDate(nextTuesday);
       return {
         show: true,
-        message: `No meeting on Tuesday, ${formattedDate} - check the calendar for our next scheduled meeting.`,
+        message: `No meeting on ${formattedDate}.`,
         nextMeetingDate: undefined,
       };
     }
 
     const events = await getCalendarEvents("1938");
 
+    // If we couldn't fetch events, show generic message
     if (!events || events.length === 0) {
       return {
         show: true,
@@ -47,7 +48,7 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
       const formattedDate = formatDate(nextTuesday);
       return {
         show: true,
-        message: `No meeting on Tuesday, ${formattedDate} - check the calendar for our next scheduled meeting.`,
+        message: `No meeting on ${formattedDate}.`,
         nextMeetingDate: undefined,
       };
     }
