@@ -26,8 +26,13 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 
   try {
     // Use our API route which forwards the client's User-Agent
-    const apiUrl = `/api/calendar`;
-    logger.info("calendar", "fetch_start_via_api", { apiUrl, clubId });
+    // Server-side fetch requires absolute URLs
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    const apiUrl = `${baseUrl}/api/calendar`;
+
+    logger.info("calendar", "fetch_start_via_api", { apiUrl, clubId, baseUrl });
 
     const response = await fetch(apiUrl, {
       cache: "no-store", // Disable caching for debugging
