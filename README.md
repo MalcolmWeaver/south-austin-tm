@@ -151,12 +151,6 @@ The calendar automatically fetches events from Easy-Speak using the iCal feed:
 
 This project is intended for use by South Austin Toastmasters club.
 
-## Contact
-
-For questions or support:
-- Email: southaustintoastmasters@gmail.com
-- Phone: 512-351-2706
-
 ## Contributing
 
 This is a club-specific website. For contributions, please contact the club officers.
