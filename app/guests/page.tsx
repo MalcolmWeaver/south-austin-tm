@@ -171,7 +171,7 @@ export default function GuestsPage() {
             Fill out our prospective member form and we'll get in touch with you!
           </p>
           <a
-            href="#"
+            href="https://www.toastmasters.org/Find-a-Club/01085173-south-austin/contact-club?id=e741e89a-8cd7-ec11-a2fd-005056875f20"
             className="inline-block bg-tm-blue text-white px-6 py-3 rounded-lg font-bold hover:bg-opacity-90 transition-colors"
           >
             Prospective Member Sign-Up Form →

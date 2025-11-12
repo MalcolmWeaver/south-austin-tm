@@ -110,7 +110,7 @@ export default function MembersPage() {
                 Find district events, contests, and additional resources.
               </p>
               <a
-                href="#"
+                href="https://www.tmd55.org/"
                 className="text-tm-blue hover:underline font-semibold"
               >
                 Visit District Website →
