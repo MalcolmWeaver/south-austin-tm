@@ -89,9 +89,22 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
  * @returns Next Tuesday's date in CST
  */
 function getNextTuesday(from: Date = new Date()): Date {
-  // Get current date in CST
-  const dateInCST = new Date(from.toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  dateInCST.setHours(0, 0, 0, 0);
+  // Get date components in CST timezone using Intl.DateTimeFormat
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+  });
+
+  const parts = formatter.formatToParts(from);
+  const year = parseInt(parts.find(p => p.type === "year")!.value);
+  const month = parseInt(parts.find(p => p.type === "month")!.value) - 1; // 0-indexed
+  const day = parseInt(parts.find(p => p.type === "day")!.value);
+
+  // Create date in CST
+  const dateInCST = new Date(year, month, day, 0, 0, 0, 0);
 
   const dayOfWeek = dateInCST.getDay();
 
@@ -117,18 +130,32 @@ function getNextTuesday(from: Date = new Date()): Date {
 }
 
 /**
+ * Helper: Get date components in CST
+ */
+function getDateInCST(date: Date): { year: number; month: number; day: number } {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const parts = formatter.formatToParts(date);
+  return {
+    year: parseInt(parts.find(p => p.type === "year")!.value),
+    month: parseInt(parts.find(p => p.type === "month")!.value),
+    day: parseInt(parts.find(p => p.type === "day")!.value),
+  };
+}
+
+/**
  * Check if two dates are the same day (ignoring time, in CST)
  */
 function isSameDay(date1: Date, date2: Date): boolean {
-  // Convert both dates to CST for comparison
-  const date1InCST = new Date(date1.toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  const date2InCST = new Date(date2.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  const d1 = getDateInCST(date1);
+  const d2 = getDateInCST(date2);
 
-  return (
-    date1InCST.getFullYear() === date2InCST.getFullYear() &&
-    date1InCST.getMonth() === date2InCST.getMonth() &&
-    date1InCST.getDate() === date2InCST.getDate()
-  );
+  return d1.year === d2.year && d1.month === d2.month && d1.day === d2.day;
 }
 
 /**
