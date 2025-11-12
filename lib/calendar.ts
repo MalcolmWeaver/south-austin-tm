@@ -1,4 +1,4 @@
-import ical, { CalendarComponent } from "node-ical";
+import ical from "node-ical";
 
 export interface CalendarEvent {
   uid: string;

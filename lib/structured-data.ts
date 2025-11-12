@@ -123,10 +123,3 @@ export function generateEventSchema(event: CalendarEvent) {
     },
   };
 }
-
-/**
- * Helper function to create JSON-LD script tag content
- */
-export function createStructuredData(schema: object): string {
-  return JSON.stringify(schema);
-}

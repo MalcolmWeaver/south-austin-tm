@@ -114,14 +114,6 @@ function isSameDay(date1: Date, date2: Date): boolean {
 }
 
 /**
- * Check if today is a meeting day (Tuesday)
- */
-export function isTodayMeetingDay(): boolean {
-  const today = new Date();
-  return today.getDay() === 2; // Tuesday = 2
-}
-
-/**
  * Format date as "Month Day, Year" (e.g., "November 19, 2025")
  */
 function formatDate(date: Date): string {
