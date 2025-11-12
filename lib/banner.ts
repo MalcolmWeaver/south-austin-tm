@@ -111,11 +111,11 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
  * @returns Next Tuesday's date in CST
  */
 function getNextTuesday(from: Date = new Date()): Date {
-  logger.info("banner", "getNextTuesday_start", { fromDate: from.toISOString() });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_start", fromDate: from.toISOString() }));
 
   // Get current date components in CST
   const cstDate = getDateInCST(from);
-  logger.info("banner", "getNextTuesday_cstDate", { cstDate });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_cstDate", cstDate }));
 
   // Get the day of week in CST timezone
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -124,14 +124,14 @@ function getNextTuesday(from: Date = new Date()): Date {
   });
 
   const weekdayStr = formatter.format(from);
-  logger.info("banner", "getNextTuesday_weekdayStr", { weekdayStr });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_weekdayStr", weekdayStr }));
 
   // Map weekday string to number (0 = Sunday, 1 = Monday, etc.)
   const weekdayMap: Record<string, number> = {
     'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6
   };
   const dayOfWeek = weekdayMap[weekdayStr];
-  logger.info("banner", "getNextTuesday_dayOfWeek", { dayOfWeek });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_dayOfWeek", dayOfWeek }));
 
   // Calculate days until next Tuesday
   // If today is Tuesday (2), next Tuesday is in 7 days
@@ -148,14 +148,11 @@ function getNextTuesday(from: Date = new Date()): Date {
     // After Tuesday this week
     daysUntilTuesday = 7 - (dayOfWeek - 2);
   }
-  logger.info("banner", "getNextTuesday_daysUntilTuesday", { daysUntilTuesday });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_daysUntilTuesday", daysUntilTuesday }));
 
   // Create result date by adding days to the CST date components
   const resultDate = new Date(cstDate.year, cstDate.month - 1, cstDate.day + daysUntilTuesday);
-  logger.info("banner", "getNextTuesday_resultDate", {
-    resultDate: resultDate.toISOString(),
-    resultDateFormatted: formatDate(resultDate)
-  });
+  console.log(JSON.stringify({ level: "info", service: "banner", action: "getNextTuesday_resultDate", resultDate: resultDate.toISOString(), resultDateFormatted: formatDate(resultDate) }));
 
   return resultDate;
 }
