@@ -51,9 +51,31 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
     }
 
     // Check if there's a meeting next Tuesday
+    logger.info("banner", "checking_for_meeting", {
+      nextTuesday: nextTuesday.toISOString(),
+      nextTuesdayFormatted: formatDate(nextTuesday),
+      eventCount: events.length,
+    });
+
     const nextTuesdayMeeting = events.find((event) => {
       const eventDate = new Date(event.start);
-      return isSameDay(eventDate, nextTuesday);
+      const isSame = isSameDay(eventDate, nextTuesday);
+
+      logger.info("banner", "comparing_event", {
+        eventStart: event.start.toISOString(),
+        eventSummary: event.summary,
+        nextTuesday: nextTuesday.toISOString(),
+        isSameDay: isSame,
+        eventDateInCST: getDateInCST(eventDate),
+        nextTuesdayInCST: getDateInCST(nextTuesday),
+      });
+
+      return isSame;
+    });
+
+    logger.info("banner", "meeting_search_result", {
+      found: !!nextTuesdayMeeting,
+      meetingSummary: nextTuesdayMeeting?.summary,
     });
 
     if (!nextTuesdayMeeting) {
