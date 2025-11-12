@@ -24,10 +24,41 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
     timestamp: new Date().toISOString()
   });
 
+  let icsData: string;
+
   try {
-    // Fetch directly from Easy-Speak
+    // First, try to read from the static file synced by GitHub Actions
+    logger.info("calendar", "trying_static_file", { path: "/calendar.ics" });
+
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+
+    const staticFileUrl = `${baseUrl}/calendar.ics`;
+
+    const staticResponse = await fetch(staticFileUrl, {
+      cache: "no-store",
+    });
+
+    if (staticResponse.ok) {
+      icsData = await staticResponse.text();
+
+      // Verify it's valid calendar data
+      if (icsData.includes("BEGIN:VCALENDAR")) {
+        logger.info("calendar", "using_static_file", { dataLength: icsData.length });
+      } else {
+        throw new Error("Static file doesn't contain valid calendar data");
+      }
+    } else {
+      throw new Error(`Static file not found: ${staticResponse.status}`);
+    }
+  } catch (staticError) {
+    // Fallback: Try to fetch directly from Easy-Speak
     // Note: This will likely be blocked by Cloudflare from Vercel's servers
-    // but we handle the error gracefully
+    logger.info("calendar", "static_file_failed_trying_direct_fetch", {
+      error: staticError instanceof Error ? staticError.message : String(staticError)
+    });
+
     const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
     logger.info("calendar", "fetch_start", { url, clubId });
 
@@ -35,7 +66,7 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
       headers: {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
       },
-      cache: "no-store", // Disable caching for debugging
+      cache: "no-store",
     });
 
     logger.info("calendar", "fetch_response", {
@@ -55,13 +86,16 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
       logger.error("calendar", "fetch_failed", error, {
         status: response.status,
         errorBody: errorBody.substring(0, 200),
-        note: "This is expected if Cloudflare blocks Vercel's servers. Calendar will show no events."
+        note: "Both static file and direct fetch failed. Calendar will show no events."
       });
       throw error;
     }
 
-    const icsData = await response.text();
-    logger.info("calendar", "received_ics_data", { dataLength: icsData.length });
+    icsData = await response.text();
+    logger.info("calendar", "received_ics_data_from_direct_fetch", { dataLength: icsData.length });
+  }
+
+  try {
 
     // Parse the iCal data
     const events = await ical.async.parseICS(icsData);

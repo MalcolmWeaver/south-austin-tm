@@ -1,0 +1,133 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//easy-speak.org//NONSGML kigkonsult.se iCalcreator 2.16.12//
+METHOD:PUBLISH
+X-WR-CALNAME:South Austin
+X-WR-CALDESC:South Austin
+X-WR-TIMEZONE:America/Chicago
+BEGIN:VTIMEZONE
+TZID:America/Chicago
+X-LIC-LOCATION:America/Chicago
+BEGIN:STANDARD
+DTSTART:20251102T020000
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0600
+RDATE:20261101T020000
+TZNAME:CST
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20260308T020000
+TZOFFSETFROM:-0600
+TZOFFSETTO:-0500
+TZNAME:CDT
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:566539-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: Mystery Night: Someone Has Stolen the Gavel! WOT
+ D: aspersion
+DTSTART;TZID=America/Chicago:20251028T190000
+DTEND;TZID=America/Chicago:20251028T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615643
+END:VEVENT
+BEGIN:VEVENT
+UID:566540-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: Finding Focus in World Designed to Distract
+DTSTART;TZID=America/Chicago:20251104T190000
+DTEND;TZID=America/Chicago:20251104T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615644
+END:VEVENT
+BEGIN:VEVENT
+UID:566541-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: Veteran's Day
+DTSTART;TZID=America/Chicago:20251111T190000
+DTEND;TZID=America/Chicago:20251111T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615645
+END:VEVENT
+BEGIN:VEVENT
+UID:566542-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: TBA
+DTSTART;TZID=America/Chicago:20251118T190000
+DTEND;TZID=America/Chicago:20251118T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615646
+END:VEVENT
+BEGIN:VEVENT
+UID:566543-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: TBA
+DTSTART;TZID=America/Chicago:20251125T190000
+DTEND;TZID=America/Chicago:20251125T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615647
+END:VEVENT
+BEGIN:VEVENT
+UID:566544-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: TBA
+DTSTART;TZID=America/Chicago:20251202T190000
+DTEND;TZID=America/Chicago:20251202T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615648
+END:VEVENT
+BEGIN:VEVENT
+UID:566545-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: TBA
+DTSTART;TZID=America/Chicago:20251209T190000
+DTEND;TZID=America/Chicago:20251209T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=615649
+END:VEVENT
+BEGIN:VEVENT
+UID:568553-1938@easy-speak.org
+DTSTAMP:20251112T062558Z
+DESCRIPTION:Meeting theme: TBA
+DTSTART;TZID=America/Chicago:20251216T190000
+DTEND;TZID=America/Chicago:20251216T191000
+GEO:+30.21533;-97.796112
+LOCATION:Austin Community College\, South Austin Campus\, Room 1319 (3rd Fl
+ oor) (South Austin ACC Campus\n1820 W. Stassney Lane\nAustin\, TX 78745-36
+ 21)
+SUMMARY:South Austin
+URL:https://easy-speak.org/view_meeting.php?t=617776
+END:VEVENT
+END:VCALENDAR
+
+
+

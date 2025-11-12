@@ -1,0 +1,43 @@
+name: Sync Calendar from Easy-Speak
+
+on:
+  schedule:
+    # Run every 6 hours at :00 (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync-calendar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch calendar from Easy-Speak
+        run: |
+          curl 'https://easy-speak.org/webcal.php?c=1938' \
+            -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36' \
+            -o public/calendar.ics
+
+          # Check if we got valid calendar data
+          if grep -q "BEGIN:VCALENDAR" public/calendar.ics; then
+            echo "✅ Successfully fetched calendar data"
+          else
+            echo "❌ Failed to fetch valid calendar data"
+            exit 1
+          fi
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code public/calendar.ics || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/calendar.ics
+          git commit -m "Update calendar data from Easy-Speak"
+          git push
