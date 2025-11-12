@@ -151,7 +151,15 @@ function getNextTuesday(from: Date = new Date()): Date {
   console.error(JSON.stringify({ level: "error", service: "banner", action: "getNextTuesday_daysUntilTuesday", daysUntilTuesday }));
 
   // Create result date by adding days to the CST date components
-  const resultDate = new Date(cstDate.year, cstDate.month - 1, cstDate.day + daysUntilTuesday);
+  // We need to create a Date that represents the target Tuesday
+  // The exact time doesn't matter since isSameDay() only compares date components in CST
+  const targetDay = cstDate.day + daysUntilTuesday;
+
+  // Create a date at noon UTC on the target day to avoid any timezone boundary issues
+  // Since isSameDay() converts both dates to CST and compares only the date parts,
+  // using noon UTC ensures we're solidly in the middle of the target day
+  const resultDate = new Date(Date.UTC(cstDate.year, cstDate.month - 1, targetDay, 12, 0, 0));
+
   console.error(JSON.stringify({ level: "error", service: "banner", action: "getNextTuesday_resultDate", resultDate: resultDate.toISOString(), resultDateFormatted: formatDate(resultDate) }));
 
   return resultDate;
