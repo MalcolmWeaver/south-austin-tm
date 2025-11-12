@@ -25,51 +25,37 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
   });
 
   try {
-    const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
-    logger.info("calendar", "fetch_start", { url, clubId });
+    // Use our API route which forwards the client's User-Agent
+    const apiUrl = `/api/calendar`;
+    logger.info("calendar", "fetch_start_via_api", { apiUrl, clubId });
 
-    // Use native Next.js fetch (works better in Server Components)
-    // Using minimal headers - sometimes less is more to avoid blocking
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-      },
+    const response = await fetch(apiUrl, {
       cache: "no-store", // Disable caching for debugging
     });
 
-    // Log detailed response info including headers
-    const responseHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      responseHeaders[key] = value;
-    });
-
-    logger.info("calendar", "fetch_response", {
+    logger.info("calendar", "api_response", {
       status: response.status,
       statusText: response.statusText,
-      headers: responseHeaders,
-      url: response.url,
     });
 
     if (!response.ok) {
-      let errorBody = "";
+      let errorData;
       try {
-        errorBody = await response.text();
+        errorData = await response.json();
       } catch (e) {
-        logger.error("calendar", "error_reading_body", e);
+        errorData = { error: "Failed to parse error response" };
       }
 
-      const error = new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
-      logger.error("calendar", "fetch_failed", error, {
+      const error = new Error(`API fetch failed: ${response.status} ${response.statusText}`);
+      logger.error("calendar", "api_fetch_failed", error, {
         status: response.status,
-        statusText: response.statusText,
-        errorBody: errorBody.substring(0, 500), // Limit error body length
-        headers: responseHeaders,
+        errorData,
       });
       throw error;
     }
 
     const icsData = await response.text();
-    logger.info("calendar", "received_ics_data", { dataLength: icsData.length });
+    logger.info("calendar", "received_ics_data_from_api", { dataLength: icsData.length });
 
     // Parse the iCal data
     const events = await ical.async.parseICS(icsData);
