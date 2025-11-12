@@ -1,6 +1,7 @@
 import { getCalendarEvents } from "@/lib/calendar";
 import EventCard from "@/components/EventCard";
 import { localBusinessSchema, generateEventSchema } from "@/lib/structured-data";
+import { logger } from "@/lib/logger";
 
 // Enable ISR - revalidate every 4 hours
 export const revalidate = 14400;
@@ -10,12 +11,7 @@ export default async function CalendarPage() {
   const events = await getCalendarEvents("1938");
 
   // Log for debugging in deployment
-  console.log(JSON.stringify({
-    level: "info",
-    service: "calendar_page",
-    action: "render",
-    eventCount: events.length,
-  }));
+  logger.info("calendar_page", "render", { eventCount: events.length });
 
   return (
     <div className="py-12 bg-gray-50 min-h-screen">
