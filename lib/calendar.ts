@@ -25,42 +25,43 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
   });
 
   try {
-    // Use our API route which forwards the client's User-Agent
-    // Server-side fetch requires absolute URLs
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/calendar`;
+    // Fetch directly from Easy-Speak
+    // Note: This will likely be blocked by Cloudflare from Vercel's servers
+    // but we handle the error gracefully
+    const url = `https://easy-speak.org/webcal.php?c=${clubId}`;
+    logger.info("calendar", "fetch_start", { url, clubId });
 
-    logger.info("calendar", "fetch_start_via_api", { apiUrl, clubId, baseUrl });
-
-    const response = await fetch(apiUrl, {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+      },
       cache: "no-store", // Disable caching for debugging
     });
 
-    logger.info("calendar", "api_response", {
+    logger.info("calendar", "fetch_response", {
       status: response.status,
       statusText: response.statusText,
     });
 
     if (!response.ok) {
-      let errorData;
+      let errorBody = "";
       try {
-        errorData = await response.json();
+        errorBody = await response.text();
       } catch (e) {
-        errorData = { error: "Failed to parse error response" };
+        logger.error("calendar", "error_reading_body", e);
       }
 
-      const error = new Error(`API fetch failed: ${response.status} ${response.statusText}`);
-      logger.error("calendar", "api_fetch_failed", error, {
+      const error = new Error(`Failed to fetch calendar: ${response.status} ${response.statusText}`);
+      logger.error("calendar", "fetch_failed", error, {
         status: response.status,
-        errorData,
+        errorBody: errorBody.substring(0, 200),
+        note: "This is expected if Cloudflare blocks Vercel's servers. Calendar will show no events."
       });
       throw error;
     }
 
     const icsData = await response.text();
-    logger.info("calendar", "received_ics_data_from_api", { dataLength: icsData.length });
+    logger.info("calendar", "received_ics_data", { dataLength: icsData.length });
 
     // Parse the iCal data
     const events = await ical.async.parseICS(icsData);
