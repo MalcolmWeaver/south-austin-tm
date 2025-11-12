@@ -84,15 +84,16 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
 }
 
 /**
- * Helper: Get next Tuesday date
+ * Helper: Get next Tuesday date (in CST)
  * @param from - Starting date (defaults to today)
- * @returns Next Tuesday's date
+ * @returns Next Tuesday's date in CST
  */
 function getNextTuesday(from: Date = new Date()): Date {
-  const date = new Date(from);
-  date.setHours(0, 0, 0, 0);
+  // Get current date in CST
+  const dateInCST = new Date(from.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  dateInCST.setHours(0, 0, 0, 0);
 
-  const dayOfWeek = date.getDay();
+  const dayOfWeek = dateInCST.getDay();
 
   // Calculate days until next Tuesday
   // If today is Tuesday (2), next Tuesday is in 7 days
@@ -110,29 +111,34 @@ function getNextTuesday(from: Date = new Date()): Date {
     daysUntilTuesday = 7 - (dayOfWeek - 2);
   }
 
-  date.setDate(date.getDate() + daysUntilTuesday);
+  dateInCST.setDate(dateInCST.getDate() + daysUntilTuesday);
 
-  return date;
+  return dateInCST;
 }
 
 /**
- * Check if two dates are the same day (ignoring time)
+ * Check if two dates are the same day (ignoring time, in CST)
  */
 function isSameDay(date1: Date, date2: Date): boolean {
+  // Convert both dates to CST for comparison
+  const date1InCST = new Date(date1.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  const date2InCST = new Date(date2.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+
   return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
+    date1InCST.getFullYear() === date2InCST.getFullYear() &&
+    date1InCST.getMonth() === date2InCST.getMonth() &&
+    date1InCST.getDate() === date2InCST.getDate()
   );
 }
 
 /**
- * Format date as "Month Day, Year" (e.g., "November 19, 2025")
+ * Format date as "Month Day, Year" (e.g., "November 19, 2025") in CST
  */
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "America/Chicago",
   });
 }

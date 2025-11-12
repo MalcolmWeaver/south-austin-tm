@@ -137,11 +137,14 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
     // Sort events by start date (ascending)
     calendarEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // Filter to only show upcoming events (today and future)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Filter to only show upcoming events (today and future in CST)
+    const todayInCST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+    todayInCST.setHours(0, 0, 0, 0);
 
-    const upcomingEvents = calendarEvents.filter(event => event.start >= today);
+    const upcomingEvents = calendarEvents.filter(event => {
+      const eventInCST = new Date(event.start.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+      return eventInCST >= todayInCST;
+    });
 
     logger.info("calendar", "process_complete", {
       totalEvents: calendarEvents.length,
@@ -155,7 +158,7 @@ export async function getCalendarEvents(clubId: string = "1938"): Promise<Calend
 }
 
 /**
- * Formats a date for display
+ * Formats a date for display in CST
  */
 export function formatEventDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -163,29 +166,35 @@ export function formatEventDate(date: Date): string {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "America/Chicago",
   }).format(date);
 }
 
 /**
- * Formats a time for display
+ * Formats a time for display in CST
  */
 export function formatEventTime(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
+    timeZone: "America/Chicago",
   }).format(date);
 }
 
 /**
- * Checks if an event is happening today
+ * Checks if an event is happening today (in CST)
  */
 export function isToday(date: Date): boolean {
-  const today = new Date();
+  // Get current date in CST
+  const todayInCST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  // Get event date in CST
+  const eventInCST = new Date(date.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+
   return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
+    eventInCST.getDate() === todayInCST.getDate() &&
+    eventInCST.getMonth() === todayInCST.getMonth() &&
+    eventInCST.getFullYear() === todayInCST.getFullYear()
   );
 }
 
