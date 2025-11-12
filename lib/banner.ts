@@ -111,22 +111,22 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
  * @returns Next Tuesday's date in CST
  */
 function getNextTuesday(from: Date = new Date()): Date {
-  // Get current date in CST using toLocaleString
-  const cstDateStr = from.toLocaleString("en-US", {
+  // Get current date components in CST
+  const cstDate = getDateInCST(from);
+
+  // Get the day of week in CST timezone
+  const formatter = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Chicago",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
+    weekday: "short",
   });
 
-  // Parse the CST date string (format: MM/DD/YYYY)
-  const [month, day, year] = cstDateStr.split(/[\/,\s]+/).map(s => parseInt(s));
+  const weekdayStr = formatter.format(from);
 
-  // Create a date object representing midnight CST
-  // We use UTC date constructor and then adjust to CST offset
-  const dateInCST = new Date(year, month - 1, day, 0, 0, 0, 0);
-
-  const dayOfWeek = dateInCST.getDay();
+  // Map weekday string to number (0 = Sunday, 1 = Monday, etc.)
+  const weekdayMap: Record<string, number> = {
+    'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6
+  };
+  const dayOfWeek = weekdayMap[weekdayStr];
 
   // Calculate days until next Tuesday
   // If today is Tuesday (2), next Tuesday is in 7 days
@@ -144,9 +144,10 @@ function getNextTuesday(from: Date = new Date()): Date {
     daysUntilTuesday = 7 - (dayOfWeek - 2);
   }
 
-  dateInCST.setDate(dateInCST.getDate() + daysUntilTuesday);
+  // Create result date by adding days to the CST date components
+  const resultDate = new Date(cstDate.year, cstDate.month - 1, cstDate.day + daysUntilTuesday);
 
-  return dateInCST;
+  return resultDate;
 }
 
 /**
