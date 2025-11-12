@@ -33,7 +33,7 @@ export default function EventCard({ event }: EventCardProps) {
       <div className="text-gray-700 mb-4">
         <p className="font-semibold">{formatEventDate(event.start)}</p>
         <p className="text-gray-600">
-          {formatEventTime(event.start)} - {formatEventTime(event.end)}
+          {formatEventTime(event.start)}
         </p>
       </div>
 

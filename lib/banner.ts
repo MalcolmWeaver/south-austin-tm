@@ -12,6 +12,20 @@ export interface BannerState {
  */
 export async function getNextTuesdayMeeting(): Promise<BannerState> {
   try {
+    // Get next Tuesday
+    const today = new Date();
+    const nextTuesday = getNextTuesday(today);
+
+    // Mock mode for testing "no meeting" banner
+    if (process.env.MOCK_NO_MEETING === "true") {
+      const formattedDate = formatDate(nextTuesday);
+      return {
+        show: true,
+        message: `No meeting on Tuesday, ${formattedDate} - check the calendar for our next scheduled meeting.`,
+        nextMeetingDate: undefined,
+      };
+    }
+
     const events = await getCalendarEvents("1938");
 
     if (!events || events.length === 0) {
@@ -22,10 +36,6 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
       };
     }
 
-    // Get next Tuesday
-    const today = new Date();
-    const nextTuesday = getNextTuesday(today);
-
     // Check if there's a meeting next Tuesday
     const nextTuesdayMeeting = events.find((event) => {
       const eventDate = new Date(event.start);
@@ -34,9 +44,10 @@ export async function getNextTuesdayMeeting(): Promise<BannerState> {
 
     if (!nextTuesdayMeeting) {
       // No meeting next Tuesday - show banner
+      const formattedDate = formatDate(nextTuesday);
       return {
         show: true,
-        message: "No meeting next Tuesday - check the calendar for our next scheduled meeting.",
+        message: `No meeting on Tuesday, ${formattedDate} - check the calendar for our next scheduled meeting.`,
         nextMeetingDate: undefined,
       };
     }
@@ -107,4 +118,15 @@ function isSameDay(date1: Date, date2: Date): boolean {
 export function isTodayMeetingDay(): boolean {
   const today = new Date();
   return today.getDay() === 2; // Tuesday = 2
+}
+
+/**
+ * Format date as "Month Day, Year" (e.g., "November 19, 2025")
+ */
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }

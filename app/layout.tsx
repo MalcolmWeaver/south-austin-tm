@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AutoBanner from "@/components/AutoBanner";
 import { organizationSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
@@ -68,6 +69,7 @@ export default function RootLayout({
       <body className="flex flex-col min-h-screen antialiased">
         <header>
           <Navigation />
+          <AutoBanner />
         </header>
         <main className="flex-grow">{children}</main>
         <footer>

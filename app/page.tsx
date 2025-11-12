@@ -1,4 +1,3 @@
-import AutoBanner from "@/components/AutoBanner";
 import Image from "next/image";
 
 // Enable ISR - revalidate every 4 hours (sync with calendar)
@@ -7,9 +6,6 @@ export const revalidate = 14400;
 export default function Home() {
   return (
     <div>
-      {/* Automatic Banner - shows when no meeting next Tuesday */}
-      <AutoBanner />
-
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-tm-blue to-tm-maroon text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
